@@ -1,0 +1,21 @@
+# Файлы с секретами
+.env
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.pyc
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Временные файлы
+*.log
+*.tmp
+.DS_Store
