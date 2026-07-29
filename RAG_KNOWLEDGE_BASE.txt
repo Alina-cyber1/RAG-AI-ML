@@ -1,0 +1,590 @@
+=== ТЕМА 1: GOOGLE-СЕРВИСЫ И GOOGLE COLABORATORY ===
+
+Google Colab — бесплатная облачная среда для запуска Jupyter ноутбуков с поддержкой GPU и TPU.
+
+Основные возможности:
+- Бесплатный доступ к GPU (NVIDIA Tesla T4, K80, V100, A100)
+- Предустановленные библиотеки (TensorFlow, PyTorch, Keras, NumPy, Pandas)
+- Интеграция с Google Диском
+- Совместная работа (как Google Docs)
+
+Как включить GPU: Среда выполнения → Сменить среду выполнения → Аппаратный ускоритель → GPU
+
+Подключение Google Диска:
+from google.colab import drive
+drive.mount('/content/drive')
+
+Важно: виртуальная машина живёт ~12 часов, после отключения все файлы удаляются.
+
+=== ТЕМА 2: НЕЙРОННЫЕ СЕТИ И KERAS ===
+
+Нейронная сеть — это математическая модель, имитирующая работу человеческого мозга. Состоит из слоев нейронов.
+
+Keras — высокоуровневый API для нейронных сетей.
+
+Sequential модель:
+model = Sequential()
+model.add(Dense(64, activation='relu', input_shape=(784,)))
+
+Функции активации:
+- ReLU: max(0,x) — для скрытых слоёв
+- Sigmoid: 1/(1+e^-x) — бинарная классификация
+- Softmax: e^x_i / sum(e^x_j) — многоклассовая классификация
+- Linear: f(x)=x — регрессия
+
+Loss функции:
+- categorical_crossentropy — многоклассовая (one-hot)
+- binary_crossentropy — бинарная
+- mse — регрессия
+
+Оптимизаторы: Adam, SGD, RMSprop
+
+=== ТЕМА 3: ГРАДИЕНТНЫЙ СПУСК ===
+
+Градиентный спуск — это метод оптимизации для минимизации функции потерь.
+
+Принцип работы:
+1. Вычисляем градиент (производную) функции потерь
+2. Делаем шаг в противоположном направлении градиента
+3. Повторяем, пока не достигнем минимума
+
+Формула: θ = θ - η * ∇J(θ), где η — learning rate (скорость обучения)
+
+Оптимизаторы на основе градиентного спуска: SGD, Adam, RMSprop, Adagrad
+
+=== ТЕМА 4: СВЁРТОЧНЫЕ НЕЙРОННЫЕ СЕТИ (CNN) ===
+
+CNN (Convolutional Neural Network) — сверточная нейронная сеть для обработки изображений.
+
+Основные компоненты:
+- Conv2D: сверточный слой (применяет фильтры к изображению)
+- MaxPooling2D: уменьшает размерность (берет максимальное значение в окне)
+- Flatten: преобразует 2D в 1D для полносвязных слоев
+
+Параметры Conv2D:
+- filters: количество фильтров
+- kernel_size: размер ядра свертки (3x3, 5x5)
+- padding: 'same' (сохраняет размер) или 'valid' (уменьшает)
+- activation: функция активации ('relu', 'sigmoid')
+
+YOLO (You Only Look Once) — для детекции объектов.
+
+=== ТЕМА 5: РЕКУРРЕНТНЫЕ СЕТИ (LSTM, RNN) ===
+
+LSTM (Long Short-Term Memory) — тип рекуррентной нейронной сети, решающий проблему затухающего градиента.
+
+Особенности LSTM:
+- Сохраняет информацию на длительное время
+- Имеет три "вентиля": входной, забывающий, выходной
+- Используется для последовательных данных: текст, временные ряды, аудио
+
+RNN (Рекуррентная нейронная сеть) — сеть с обратными связями, подходит для последовательных данных.
+
+Области применения:
+- NLP — обработка текста, машинный перевод
+- Прогнозирование временных рядов
+- Распознавание речи
+
+=== ТЕМА 6: DOCKER И КОНТЕЙНЕРИЗАЦИЯ ===
+
+Docker — платформа для контейнеризации приложений.
+
+Основные понятия:
+- Image (образ) — шаблон для создания контейнеров
+- Container (контейнер) — запущенный экземпляр образа
+- Dockerfile — инструкции для сборки образа
+
+Основные команды:
+docker build -t my-image .    # собрать образ
+docker run my-image           # запустить контейнер
+docker ps                     # список контейнеров
+docker stop container_id      # остановить контейнер
+docker-compose up             # запуск многоконтейнерного приложения
+
+=== ТЕМА 7: RAG СИСТЕМЫ (RETRIEVAL-AUGMENTED GENERATION) ===
+
+RAG (Retrieval-Augmented Generation) — подход для улучшения ответов LLM с использованием внешней базы знаний.
+
+Этапы построения RAG-системы:
+1. Загрузка документов в базу знаний
+2. Разбиение на чанки (оптимальный размер: 800-1000 символов)
+3. Создание эмбеддингов (векторных представлений)
+4. Сохранение в векторную базу данных (FAISS, ChromaDB)
+5. При запросе — поиск релевантных чанков
+6. LLM генерирует ответ с найденным контекстом
+
+Это решает проблему "галлюцинаций" LLM и позволяет использовать актуальные данные.
+
+LangChain — фреймворк для приложений с LLM (PromptTemplate, LLMChain, VectorStore, RetrievalQA)
+
+=== ТЕМА 8: PYTORCH ===
+
+PyTorch — фреймворк машинного обучения с динамическими графами вычислений.
+
+Основные возможности:
+- Динамические графы (Define-by-Run) — более гибкий, чем TensorFlow
+- Автоматическое дифференцирование (autograd)
+- Поддержка GPU (CUDA)
+
+Пример создания модели:
+import torch.nn as nn
+class MyModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(784, 128)
+        self.fc2 = nn.Linear(128, 10)
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))
+        return self.fc2(x)
+
+DataLoader для батчей:
+from torch.utils.data import DataLoader, TensorDataset
+loader = DataLoader(dataset, batch_size=32, shuffle=True)
+
+=== ТЕМА 9: TENSORFLOW ===
+
+TensorFlow 2 — фреймворк для машинного обучения.
+
+Ключевые особенности:
+- Eager execution — операции выполняются сразу
+- Keras API — основной способ создания моделей
+- tf.data API — эффективная загрузка данных
+
+Тензоры:
+tf.constant([1,2,3])
+tf.zeros([2,3])
+tf.random.normal([3,3])
+
+GradientTape — автоматическое дифференцирование:
+with tf.GradientTape() as tape:
+    loss = loss_fn(y_pred, y_true)
+gradients = tape.gradient(loss, variables)
+
+=== ТЕМА 10: AUTOML ===
+
+AutoML — автоматизация подбора моделей и гиперпараметров.
+
+Инструменты:
+- AutoKeras — для Keras/TensorFlow
+- AutoGluon — от Amazon (таблицы, текст, изображения)
+- H2O AutoML — для классического ML
+- TPOT — генетические алгоритмы
+- Optuna — оптимизация гиперпараметров
+
+=== ТЕМА 11: КОМПЬЮТЕРНОЕ ЗРЕНИЕ ===
+
+Задачи CV:
+- Классификация — что на изображении?
+- Обнаружение объектов (detection) — где и что?
+- Сегментация — пиксельная классификация
+- OCR — распознавание текста
+
+OpenCV — библиотека для обработки изображений:
+import cv2
+img = cv2.imread('image.jpg')
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+edges = cv2.Canny(gray, 100, 200)
+
+=== ТЕМА 12: NLP И ТРАНСФОРМЕРЫ ===
+
+Трансформеры — архитектура на основе attention (без RNN). Основа BERT, GPT, T5.
+
+BERT — для понимания текста (классификация, QA, NER)
+T5 — text-to-text (всё как задача перевода)
+
+NER (Named Entity Recognition) — распознавание сущностей (имена, даты, организации)
+
+Embedding — векторное представление текста
+
+=== ТЕМА 13: РАСПОЗНАВАНИЕ И ГЕНЕРАЦИЯ РЕЧИ ===
+
+ASR (Automatic Speech Recognition) — распознавание речи. Модели: Whisper (OpenAI), Wav2Vec2 (Meta), Vosk (оффлайн)
+
+Whisper пример:
+import whisper
+model = whisper.load_model("base")
+result = model.transcribe("audio.mp3")
+
+TTS (Text-to-Speech) — синтез речи. Модели: Tacotron2, WaveGlow, VITS, Silero (русский)
+
+=== ТЕМА 14: БАЗЫ ДАННЫХ SQL ===
+
+SQL — язык запросов.
+
+Основные команды:
+SELECT * FROM table WHERE condition
+INSERT INTO table (col1, col2) VALUES (val1, val2)
+UPDATE table SET col1 = val1 WHERE condition
+DELETE FROM table WHERE condition
+
+Соединения (JOIN):
+INNER JOIN — только совпадающие
+LEFT JOIN — все из левой + совпадающие из правой
+RIGHT JOIN — все из правой + совпадающие из левой
+
+Агрегации: COUNT(), SUM(), AVG(), MIN(), MAX()
+GROUP BY — группировка
+
+=== ТЕМА 15: FASTAPI И ДЕПЛОЙ ===
+
+FastAPI — фреймворк для создания API.
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Item(BaseModel):
+    text: str
+
+@app.post("/predict")
+def predict(item: Item):
+    result = model.predict(item.text)
+    return {"prediction": result}
+
+Запуск: uvicorn main:app --reload
+
+=== ТЕМА 16: КОМПЬЮТЕРНОЕ ЗРЕНИЕ (CV) ===
+
+Компьютерное зрение (Computer Vision) — область ИИ, занимающаяся анализом изображений и видео.
+
+Основные задачи CV:
+- Классификация изображений — что изображено на картинке?
+- Обнаружение объектов (Object Detection) — где и какие объекты находятся?
+- Сегментация — попиксельное выделение объектов
+- OCR (Optical Character Recognition) — распознавание текста
+
+Популярные модели и библиотеки:
+- YOLO (You Only Look Once) — реального времени для детекции объектов
+- OpenCV — библиотека для обработки изображений (фильтры, преобразования)
+- U-Net — для медицинской сегментации
+- Mask R-CNN — для instance segmentation
+- SAM (Segment Anything) — универсальная модель от Meta
+
+Пример работы с OpenCV:
+import cv2
+img = cv2.imread('image.jpg')
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+edges = cv2.Canny(gray, 100, 200)
+
+=== ТЕМА 17: ОБРАБОТКА ЕСТЕСТВЕННОГО ЯЗЫКА (NLP) ===
+
+NLP (Natural Language Processing) — область ИИ для работы с текстами.
+
+Основные задачи NLP:
+- Классификация текстов (определение тональности, темы)
+- Извлечение сущностей (NER — имена, даты, организации)
+- Машинный перевод
+- Ответы на вопросы (QA)
+- Генерация текста
+
+Библиотеки для NLP в Python:
+- NLTK — классические инструменты (токенизация, стемминг)
+- pymorphy2 — морфологический анализ для русского языка
+- SpaCy — современная промышленная библиотека
+- Transformers (Hugging Face) — для работы с BERT, GPT, T5
+
+Пример токенизации в NLTK:
+import nltk
+nltk.download('punkt')
+tokens = nltk.word_tokenize("Привет, как дела?")
+
+Пример pymorphy2:
+import pymorphy2
+morph = pymorphy2.MorphAnalyzer()
+parsed = morph.parse('книги')[0]
+print(parsed.tag.case)  # род. падеж
+
+=== ТЕМА 18: ТРАНСФОРМЕРЫ (BERT, T5, GPT) ===
+
+Трансформеры — архитектура нейронных сетей на основе механизма внимания (attention). Это основа современных LLM.
+
+Ключевые модели на трансформерах:
+- BERT (Bidirectional Encoder Representations from Transformers) — для понимания текста (классификация, QA, NER)
+- GPT (Generative Pre-trained Transformer) — для генерации текста
+- T5 (Text-to-Text Transfer Transformer) — универсальная модель (всё как задача перевода текста в текст)
+
+Механизм внимания (Attention):
+- Позволяет модели "фокусироваться" на важных частях входного текста
+- Self-attention — внимание внутри последовательности
+- Multi-head attention — несколько "голов" внимания параллельно
+
+Преимущества трансформеров над RNN/LSTM:
+- Параллельная обработка (не последовательная)
+- Лучшее понимание длинных зависимостей
+- Масштабируемость
+
+=== ТЕМА 19: РАСПОЗНАВАНИЕ РЕЧИ (ASR) ===
+
+ASR (Automatic Speech Recognition) — технология преобразования речи в текст.
+
+Популярные модели ASR:
+- Whisper (OpenAI) — мощная мультиязычная модель (поддерживает русский)
+- Wav2Vec2 (Meta) — для задач с малым количеством данных
+- Vosk — оффлайн, легковесная, поддерживает русский
+
+Пример использования Whisper:
+import whisper
+model = whisper.load_model("base")
+result = model.transcribe("audio.mp3")
+print(result["text"])
+
+=== ТЕМА 20: СИНТЕЗ РЕЧИ (TTS) ===
+
+TTS (Text-to-Speech) — технология преобразования текста в речь.
+
+Популярные модели TTS:
+- Tacotron2 — классическая модель
+- WaveGlow — генерация высококачественного аудио
+- VITS — современная энд-ту-энд модель
+- Silero — для русского языка, легковесная
+
+Пример Silero:
+import torch
+model, example_text = torch.hub.load('snakers4/silero-models', 'model', language='ru', speaker='v3_1')
+audio = model.apply_tts("Привет, это тестовый текст")
+
+=== ТЕМА 21: GIGACHAT И ЛОКАЛЬНЫЕ МОДЕЛИ ===
+
+GigaChat — российская LLM от Сбера. Доступна через API.
+
+Особенности GigaChat:
+- Разработана в России
+- Хорошо работает с русским языком
+- Есть модели: GigaChat, GigaChat-Pro, GigaChat-Max, GigaChat-Lite
+
+Локальные модели (SoTA):
+- Llama 3 (Meta) — open-weight, отличное качество
+- Mistral — эффективная, быстрая
+- Qwen (Alibaba) — мультиязычная
+- Saiga — русскоязычная на основе Llama
+- YandexGPT — облачная от Яндекса
+
+Запуск локальной модели через Ollama:
+ollama pull llama3
+ollama run llama3 "Привет"
+
+Через transformers:
+from transformers import AutoModelForCausalLM, AutoTokenizer
+model = AutoModelForCausalLM.from_pretrained("IlyaGusev/saiga_llama3_8b")
+tokenizer = AutoTokenizer.from_pretrained("IlyaGusev/saiga_llama3_8b")
+
+=== ТЕМА 22: DOCKER (ПРОДОЛЖЕНИЕ) ===
+
+Dockerfile — инструкции для сборки образа.
+
+Пример Dockerfile:
+FROM python:3.9
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["python", "app.py"]
+
+Команды Docker:
+docker build -t my-image .    # собрать образ
+docker run my-image          # запустить контейнер
+docker ps                    # список контейнеров
+docker stop container_id     # остановить
+docker logs container_id     # посмотреть логи
+docker exec -it container_id bash  # зайти внутрь
+docker-compose up -d         # запустить многоконтейнерное приложение
+
+=== ТЕМА 23: ДЕПЛОЙ И ОБЛАЧНЫЕ СЕРВИСЫ ===
+
+Деплой — размещение приложения на сервере.
+
+Основные платформы:
+- Heroku — простой, но платный
+- Railway — современный, удобный
+- DigitalOcean — гибкий, недорогой
+- Yandex Cloud — российский провайдер
+- AWS EC2 — мировой лидер
+- Google Cloud Run
+
+Docker для деплоя:
+FROM python:3.9
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]
+
+CI/CD (Continuous Integration/Continuous Deployment):
+- Автоматическая сборка и тесты при каждом push
+- GitLab CI, GitHub Actions, Jenkins
+
+=== ТЕМА 24: БАЗЫ ДАННЫХ (ПРОДОЛЖЕНИЕ) ===
+
+Индексы — ускоряют поиск в БД. Создаются на часто используемые колонки.
+
+Транзакции — группы операций, которые выполняются "все или ничего".
+BEGIN TRANSACTION;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;
+
+Популярные СУБД:
+- PostgreSQL — продвинутая open-source (поддержка JSON, полнотекстовый поиск)
+- MySQL — простая и популярная
+- SQLite — легковесная, для малых проектов
+- Oracle — корпоративная
+- MS SQL — от Microsoft
+
+В Python:
+import sqlite3  # встроенная
+con = sqlite3.connect('database.db')
+cursor = con.execute('SELECT * FROM users')
+
+=== ТЕМА 25: РАСПРЕДЕЛЁННАЯ ОБРАБОТКА (SPARK, HADOOP) ===
+
+Spark — фреймворк для распределённой обработки больших данных. Работает в памяти (быстро).
+
+PySpark — Python API для Spark.
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName("app").getOrCreate()
+df = spark.read.csv("data.csv", header=True)
+df.groupBy("category").count().show()
+
+Hadoop — экосистема для больших данных:
+- HDFS (Hadoop Distributed File System) — распределённое хранение
+- MapReduce — модель обработки (дисковая, медленнее Spark)
+
+RDD (Resilient Distributed Dataset) — базовый абстракция Spark.
+
+=== ТЕМА 26: КЛАССИЧЕСКОЕ ML (SCIKIT-LEARN) ===
+
+Основные методы scikit-learn:
+
+Регрессия (предсказание числа):
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+Классификация:
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+
+Кластеризация (группировка без меток):
+from sklearn.cluster import KMeans, DBSCAN
+kmeans = KMeans(n_clusters=5)
+labels = kmeans.fit_predict(X)
+
+Метрики:
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+Предобработка:
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
+Разделение данных:
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+=== ТЕМА 27: AIRFLOW И MLOPS ===
+
+Airflow — оркестрация пайплайнов (DAG — Directed Acyclic Graph).
+
+Пример DAG:
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime
+
+def train():
+    print("Обучение модели")
+
+def evaluate():
+    print("Оценка модели")
+
+dag = DAG('ml_pipeline', start_date=datetime(2024,1,1), schedule_interval='@daily')
+task1 = PythonOperator(task_id='train', python_callable=train, dag=dag)
+task2 = PythonOperator(task_id='evaluate', python_callable=evaluate, dag=dag)
+task1 >> task2  # зависимости
+
+MLflow — управление lifecycle ML моделей:
+mlflow.log_param("lr", 0.001)
+mlflow.log_metric("accuracy", 0.95)
+mlflow.log_model(model, "model")
+
+MLOps — практики CI/CD для ML:
+- Автоматическое обучение
+- Валидация моделей
+- Мониторинг дрейфа данных
+
+=== ТЕМА 28: GIT И КОМАНДНАЯ РАБОТА ===
+
+Git — система контроля версий.
+
+Основные команды:
+git init                         # создать репозиторий
+git add .                        # добавить все файлы
+git commit -m "сообщение"        # создать коммит
+git push                         # отправить на сервер
+git pull                         # скачать изменения
+git branch                       # показать ветки
+git checkout -b feature          # создать ветку
+git merge feature                # слить ветку
+git status                       # статус изменений
+git log                          # история коммитов
+
+GitLab — платформа для DevOps (Git + CI/CD + репозиторий)
+Confluence — вики для документации
+Jira — трекер задач (Agile/Scrum/Kanban)
+
+=== ТЕМА 29: CI/CD НА ПРАКТИКЕ ===
+
+CI/CD — непрерывная интеграция и доставка.
+
+GitLab CI пример (.gitlab-ci.yml):
+stages:
+  - test
+  - deploy
+
+test:
+  stage: test
+  script:
+    - pytest tests/
+
+deploy:
+  stage: deploy
+  script:
+    - docker build -t myapp .
+    - docker push myapp
+  only:
+    - main
+
+GitHub Actions:
+name: CI
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: pytest
+
+=== ТЕМА 30: KAFKA И ПОТОКОВАЯ ОБРАБОТКА ===
+
+Kafka — платформа для потоковой передачи данных с высокой пропускной способностью.
+
+Основные компоненты Kafka:
+- Producer — отправляет сообщения в топики
+- Consumer — читает сообщения из топиков
+- Topic — категория/канал сообщений
+- Partition — разделение топика для параллельной обработки
+- Broker — сервер Kafka
+
+Пример producer:
+from kafka import KafkaProducer
+producer = KafkaProducer(bootstrap_servers='localhost:9092')
+producer.send('my-topic', b'Hello Kafka')
+
+Пример consumer:
+from kafka import KafkaConsumer
+consumer = KafkaConsumer('my-topic', bootstrap_servers='localhost:9092')
+for msg in consumer:
+    print(msg.value)
+
+Применения:
+- Логирование
+- Event-driven архитектуры
+- Обработка данных в реальном времени
