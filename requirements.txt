@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+streamlit
+aiogram
+python-telegram-bot
+pandas
+numpy
+faiss-cpu
+openai
+gigachat
+python-dotenv
+pydantic
+notebook
+jupyter
