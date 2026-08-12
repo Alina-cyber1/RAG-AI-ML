@@ -1,24 +1,22 @@
 import os
 import re
-import threading
 import time
+import asyncio
 from flask import Flask
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import Message
 from gigachat import GigaChat
 
 # ==========================================
-# 1. НАСТРОЙКИ И ПЕРЕМЕННЫЕ ОКРУЖЕНИЯ
+# 1. НАСТРОЙКИ И ПЕРЕМЕННЫЕ
 # ==========================================
-# Вставьте сюда ваши ключи (или они будут взяты из переменных окружения Render)
 BOT_TOKEN = os.getenv("BOT_TOKEN", "ВАШ_ТОКЕН_ОТ_BOTFATHER")
 GIGACHAT_SECRET = os.getenv("GIGACHAT_SECRET", "ВАШ_СЕКРЕТНЫЙ_КЛЮЧ_GIGACHAT")
 
-# Инициализация бота и диспетчера
+# Инициализация
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-# Инициализация GigaChat (с кешированием, чтобы не создавать каждый раз)
+# GigaChat
 def init_gigachat():
     try:
         client = GigaChat(
@@ -36,14 +34,13 @@ def init_gigachat():
 client = init_gigachat()
 
 # ==========================================
-# 2. ЗАГРУЗКА БАЗЫ ЗНАНИЙ (RAG_KNOWLEDGE_BASE.txt)
+# 2. БАЗА ЗНАНИЙ
 # ==========================================
 def load_topics():
     topics = []
     file_path = "RAG_KNOWLEDGE_BASE.txt"
     
     if not os.path.exists(file_path):
-        # Если файла нет, возвращаем заглушку
         return [{'title': 'DOCKER', 'content': 'Docker — контейнеризация.', 'number': 1}]
     
     with open(file_path, 'r', encoding='utf-8') as f:
@@ -66,7 +63,7 @@ def load_topics():
 topics_data = load_topics()
 
 # ==========================================
-# 3. ЛОГИКА ПОИСКА И ОТВЕТА
+# 3. ЛОГИКА ОТВЕТА
 # ==========================================
 def find_topic(question, topics):
     q_lower = question.lower()
@@ -117,36 +114,27 @@ def ask_gigachat(question, context, topic_title):
         return f"Ошибка: {str(e)[:100]}"
 
 # ==========================================
-# 4. ОБРАБОТЧИКИ СООБЩЕНИЙ TELEGRAM
+# 4. ОБРАБОТЧИК СООБЩЕНИЙ
 # ==========================================
 @dp.message()
-async def handle_message(message: Message):
+async def handle_message(message: types.Message):
+    if message.text == "/start":
+        await message.answer("Привет! Я RAG-ассистент. Задай вопрос по AI/ML!")
+        return
+
     user_question = message.text
-    
-    # Поиск темы в базе знаний
     topic = find_topic(user_question, topics_data)
     
     if not topic:
         answer = "Извините, я не нашёл информацию на этот вопрос в базе знаний."
-        source = "Не найдено"
     else:
         answer = ask_gigachat(user_question, topic['content'][:3500], topic['title'])
-        source = topic['title']
-        answer += f"\n\n---\nИсточник: {source}"
+        answer += f"\n\n---\nИсточник: {topic['title']}"
     
-    # Отправляем ответ пользователю
     await message.answer(answer)
 
 # ==========================================
-# 5. ФУНКЦИЯ ЗАПУСКА БОТА
-# ==========================================
-def run_bot():
-    print("Telegram бот запущен и слушает сообщения...")
-    # Запускаем поллинг (проверку новых сообщений)
-    dp.run_polling(bot)
-
-# ==========================================
-# 6. ВЕБ-СЕРВЕР (ДЛЯ ОБМАНА RENDER)
+# 5. ОСНОВНОЙ ЗАПУСК БЕЗ ПОТОКОВ
 # ==========================================
 app = Flask(__name__)
 
@@ -154,16 +142,19 @@ app = Flask(__name__)
 def home():
     return "Telegram RAG Bot is Running!"
 
-# ==========================================
-# 7. ТОЧКА ВХОДА (ЗАПУСК ВСЕГО)
-# ==========================================
 if __name__ == "__main__":
-    # Запускаем бота в отдельном потоке (чтобы не блокировал веб-сервер)
-    bot_thread = threading.Thread(target=run_bot)
-    bot_thread.daemon = True  # Если упадет веб-сервер, поток закроется
-    bot_thread.start()
+    print("Запуск Telegram бота...")
     
-    # Запускаем веб-сервер
+    # Запускаем бота в асинхронном режиме в фоне
+    async def start_bot():
+        await dp.start_polling(bot)
+
+    # Параллельно запускаем бота и веб-сервер
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.create_task(start_bot())
+    
+    # Запускаем веб-сервер в том же потоке (он будет висеть)
     port = int(os.environ.get('PORT', 10000))
     print(f"Веб-сервер запущен на порту {port}...")
     app.run(host='0.0.0.0', port=port)
