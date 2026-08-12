@@ -1,1 +1,254 @@
-{"cells":[{"cell_type":"markdown","metadata":{"id":"Mf0XQx7LLscM"},"source":["## **TELEGRAM_RAG_BOT_FINAL.py**\n","Telegram бот с RAG-системой на базе GigaChat + база знаний 30"]},{"cell_type":"code","execution_count":1,"metadata":{"colab":{"base_uri":"https://localhost:8080/"},"executionInfo":{"elapsed":12259,"status":"ok","timestamp":1779528132196,"user":{"displayName":"Alina Khasanova","userId":"11750736397892541141"},"user_tz":-180},"id":"cAXQz9_kLnf0","outputId":"c4d0ee0e-2b76-4e24-d811-c1891753bb61"},"outputs":[{"name":"stdout","output_type":"stream","text":["\u001b[?25l   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.0/45.1 kB\u001b[0m \u001b[31m?\u001b[0m eta \u001b[36m-:--:--\u001b[0m\r\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m45.1/45.1 kB\u001b[0m \u001b[31m2.0 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n","\u001b[?25h\u001b[?25l   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.0/751.7 kB\u001b[0m \u001b[31m?\u001b[0m eta \u001b[36m-:--:--\u001b[0m\r\u001b[2K   \u001b[91m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[91m╸\u001b[0m \u001b[32m747.5/751.7 kB\u001b[0m \u001b[31m33.2 MB/s\u001b[0m eta \u001b[36m0:00:01\u001b[0m\r\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m751.7/751.7 kB\u001b[0m \u001b[31m11.7 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n","\u001b[?25h"]}],"source":["# -------------------- ЯЧЕЙКА 1: УСТАНОВКА БИБЛИОТЕК --------------------\n","!pip install -q gigachat aiogram nest-asyncio"]},{"cell_type":"code","execution_count":2,"metadata":{"colab":{"base_uri":"https://localhost:8080/"},"executionInfo":{"elapsed":23825,"status":"ok","timestamp":1779528156024,"user":{"displayName":"Alina Khasanova","userId":"11750736397892541141"},"user_tz":-180},"id":"dFBI3ZxJL-Ld","outputId":"2f38d49d-0a70-421d-f746-702342b58af8"},"outputs":[{"name":"stdout","output_type":"stream","text":["Mounted at /content/drive\n","Перешли в: /content/drive/MyDrive/Дипломный проект/Этап 5\n"]}],"source":["# -------------------- ЯЧЕЙКА 2: ПОДКЛЮЧЕНИЕ ДИСКА --------------------\n","from google.colab import drive, userdata\n","import os\n","\n","drive.mount('/content/drive')\n","\n","project_path = \"/content/drive/MyDrive/Дипломный проект/Этап 5\"\n","if os.path.exists(project_path):\n","    os.chdir(project_path)\n","    print(f\"Перешли в: {os.getcwd()}\")\n","else:\n","    print(f\"Папка не найдена: {project_path}\")"]},{"cell_type":"code","execution_count":3,"metadata":{"colab":{"base_uri":"https://localhost:8080/"},"executionInfo":{"elapsed":8212,"status":"ok","timestamp":1779528164237,"user":{"displayName":"Alina Khasanova","userId":"11750736397892541141"},"user_tz":-180},"id":"_wgzsXGTL-TF","outputId":"08feecd6-1617-440d-e790-b61028dbc1cd"},"outputs":[{"name":"stdout","output_type":"stream","text":["Библиотеки подключены\n"]}],"source":["# -------------------- ЯЧЕЙКА 3: ИМПОРТ БИБЛИОТЕК --------------------\n","import asyncio\n","import re\n","import logging\n","from aiogram import Bot, Dispatcher, types\n","from aiogram.filters import Command\n","from gigachat import GigaChat\n","\n","logging.basicConfig(level=logging.INFO)\n","print(\"Библиотеки подключены\")"]},{"cell_type":"code","execution_count":4,"metadata":{"colab":{"base_uri":"https://localhost:8080/"},"executionInfo":{"elapsed":932,"status":"ok","timestamp":1779528165168,"user":{"displayName":"Alina Khasanova","userId":"11750736397892541141"},"user_tz":-180},"id":"-LkXCzGsL-Z9","outputId":"0632c062-0113-4380-db08-093d523c34ad"},"outputs":[{"name":"stdout","output_type":"stream","text":["Токены получены\n"]}],"source":["# -------------------- ЯЧЕЙКА 4: ПОЛУЧЕНИЕ ТОКЕНОВ --------------------\n","\n","BOT_TOKEN = userdata.get('TELEGRAM_BOT_TOKEN')\n","GIGACHAT_CREDENTIALS = userdata.get('GIGACHAT_SECRET')\n","\n","if not BOT_TOKEN:\n","    raise ValueError(\"Нет токена Telegram! Добавьте TELEGRAM_BOT_TOKEN в секреты Colab.\")\n","if not GIGACHAT_CREDENTIALS:\n","    raise ValueError(\"Нет секрета GigaChat! Добавьте GIGACHAT_SECRET в секреты Colab.\")\n","\n","print(\"Токены получены\")"]},{"cell_type":"code","execution_count":5,"metadata":{"colab":{"base_uri":"https://localhost:8080/"},"executionInfo":{"elapsed":40,"status":"ok","timestamp":1779528165209,"user":{"displayName":"Alina Khasanova","userId":"11750736397892541141"},"user_tz":-180},"id":"mI6pcTEFMEQM","outputId":"b3a0a7fb-9903-4390-e7a3-9b86754047ac"},"outputs":[{"name":"stderr","output_type":"stream","text":["WARNING:gigachat.client:GigaChat: unknown kwargs - {'temperature': 0.3}\n"]},{"name":"stdout","output_type":"stream","text":["GigaChat клиент подключен (температура = 0.3)\n"]}],"source":["# -------------------- ЯЧЕЙКА 5: ИНИЦИАЛИЗАЦИЯ GIGACHAT --------------------\n","TEMPERATURE = 0.3\n","\n","gigachat_client = GigaChat(\n","    credentials=GIGACHAT_CREDENTIALS,\n","    scope=\"GIGACHAT_API_PERS\",\n","    verify_ssl_certs=False,\n","    timeout=60.0,\n","    temperature=TEMPERATURE\n",")\n","print(f\"GigaChat клиент подключен (температура = {TEMPERATURE})\")"]},{"cell_type":"code","execution_count":6,"metadata":{"colab":{"base_uri":"https://localhost:8080/"},"executionInfo":{"elapsed":292,"status":"ok","timestamp":1779528165502,"user":{"displayName":"Alina Khasanova","userId":"11750736397892541141"},"user_tz":-180},"id":"1fdAGE7bMEVt","outputId":"5b436224-2dc3-4310-c5ea-5acc8b0675db"},"outputs":[{"name":"stdout","output_type":"stream","text":["Загружено тем: 30\n"]}],"source":["# -------------------- ЯЧЕЙКА 6: ЗАГРУЗКА БАЗЫ ЗНАНИЙ --------------------\n","\n","def load_topics_from_file(file_path=\"RAG_KNOWLEDGE_BASE.txt\"):\n","    topics = []\n","    if not os.path.exists(file_path):\n","        print(f\"Файл {file_path} не найден!\")\n","        return topics\n","    with open(file_path, 'r', encoding='utf-8') as f:\n","        content = f.read()\n","    sections = re.split(r'(=== ТЕМА \\d+: [^=]+ ===)', content)\n","    for i in range(1, len(sections), 2):\n","        title = sections[i].strip()\n","        text = sections[i+1].strip() if i+1 \u003c len(sections) else \"\"\n","        if title and text:\n","            clean_title = title.replace('===', '').strip()\n","            topics.append({\n","                'title': clean_title,\n","                'content': text,\n","                'number': i // 2 + 1\n","            })\n","    print(f\"Загружено тем: {len(topics)}\")\n","    return topics\n","\n","topics = load_topics_from_file(\"RAG_KNOWLEDGE_BASE.txt\")\n","\n","if not topics:\n","    print(\"Файл RAG_KNOWLEDGE_BASE.txt не найден!\")\n","    topics = [\n","        {'title': 'DOCKER', 'content': 'Docker — контейнеризация приложений.', 'number': 1},\n","        {'title': 'SPARK', 'content': 'Spark — распределённая обработка данных.', 'number': 2},\n","    ]"]},{"cell_type":"code","execution_count":7,"metadata":{"executionInfo":{"elapsed":58,"status":"ok","timestamp":1779528165562,"user":{"displayName":"Alina Khasanova","userId":"11750736397892541141"},"user_tz":-180},"id":"JIOONUFZMEZN"},"outputs":[],"source":["# -------------------- ЯЧЕЙКА 7: ПОИСК ТЕМЫ ПО ЗАПРОСУ --------------------\n","\n","def find_topic(question):\n","    q_lower = question.lower()\n","    topic_mapping = {\n","        'spark': 25, 'hadoop': 25, 'pyspark': 25,\n","        'kafka': 30, 'потоковая обработка': 30,\n","        'nlp': 17, 'обработка естественного языка': 17,\n","        'bert': 18, 't5': 18, 'transformer': 18, 'gpt': 18,\n","        'docker': 6, 'контейнер': 6, 'dockerfile': 22,\n","        'airflow': 27, 'mlflow': 27, 'mlops': 27,\n","        'git': 28, 'github': 28, 'gitlab': 28, 'ci/cd': 29,\n","        'нейронная сеть': 2, 'keras': 2,\n","        'градиентный спуск': 3,\n","        'cnn': 4, 'сверточная': 4,\n","        'lstm': 5, 'rnn': 5,\n","        'rag': 7, 'langchain': 7,\n","        'pytorch': 8, 'tensorflow': 9,\n","        'automl': 10,\n","        'opencv': 11, 'компьютерное зрение': 11, 'yolo': 11,\n","        'whisper': 13, 'распознавание речи': 13,\n","        'sql': 14, 'база данных': 14,\n","        'fastapi': 15,\n","        'gigachat': 21, 'гигачат': 21,\n","        'scikit-learn': 26, 'sklearn': 26,\n","    }\n","\n","    print(f\"\\n[НОВЫЙ ЗАПРОС] Вопрос: {question}\")\n","\n","    for keyword, topic_num in topic_mapping.items():\n","        if keyword in q_lower:\n","            for t in topics:\n","                if t['number'] == topic_num:\n","                    print(f\"[РЕЗУЛЬТАТ] Найдена тема {topic_num}: {t['title']} (по ключу '{keyword}')\")\n","                    return t\n","\n","    for t in topics:\n","        title_lower = t['title'].lower()\n","        if any(word in title_lower for word in q_lower.split() if len(word) \u003e 3):\n","            print(f\"[РЕЗУЛЬТАТ] Найдена тема {t['number']}: {t['title']} (по заголовку)\")\n","            return t\n","\n","    for t in topics:\n","        content_lower = t['content'].lower()\n","        words = [w for w in q_lower.split() if len(w) \u003e 4]\n","        matches = sum(1 for w in words if w in content_lower)\n","        if matches \u003e= 2:\n","            print(f\"[РЕЗУЛЬТАТ] Найдена тема {t['number']}: {t['title']} (по содержимому)\")\n","            return t\n","\n","    print(f\"[РЕЗУЛЬТАТ] Тема не найдена для запроса: {question}\")\n","    return None"]},{"cell_type":"code","execution_count":8,"metadata":{"executionInfo":{"elapsed":26,"status":"ok","timestamp":1779528165593,"user":{"displayName":"Alina Khasanova","userId":"11750736397892541141"},"user_tz":-180},"id":"w6SsfIhDMLDG"},"outputs":[],"source":["# -------------------- ЯЧЕЙКА 8: ЗАПРОС К GIGACHAT --------------------\n","\n","def ask_gigachat(question, context, topic_title):\n","    print(f\"\\n[GIGACHAT] Отправка запроса...\")\n","    print(f\"[GIGACHAT] Тема: {topic_title}\")\n","    print(f\"[GIGACHAT] Размер контекста: {len(context[:3500])} символов\")\n","\n","    prompt = f\"\"\"Ты эксперт по курсу AI/ML. Используй ТОЛЬКО контекст ниже.\n","\n","Тема: {topic_title}\n","\n","Если ответ ЕСТЬ в контексте - дай развёрнутый ответ.\n","Если ответа НЕТ - напиши: \"В базе знаний нет информации.\"\n","\n","КОНТЕКСТ:\n","{context[:3500]}\n","\n","ВОПРОС: {question}\n","\n","ОТВЕТ:\"\"\"\n","\n","    try:\n","        response = gigachat_client.chat(prompt)\n","        if response and response.choices:\n","            answer = response.choices[0].message.content\n","            print(f\"[GIGACHAT] Ответ получен, длина: {len(answer)} символов\")\n","            return answer\n","        return \"Ошибка получения ответа\"\n","    except Exception as e:\n","        print(f\"[GIGACHAT] Ошибка: {str(e)[:100]}\")\n","        return f\"Ошибка: {str(e)[:100]}\""]},{"cell_type":"code","execution_count":9,"metadata":{"executionInfo":{"elapsed":226,"status":"ok","timestamp":1779528165829,"user":{"displayName":"Alina Khasanova","userId":"11750736397892541141"},"user_tz":-180},"id":"EiRNQfPIMLGt"},"outputs":[],"source":["# -------------------- ЯЧЕЙКА 9: СОЗДАНИЕ БОТА --------------------\n","bot = Bot(token=BOT_TOKEN)\n","dp = Dispatcher()\n","\n","@dp.message(Command(\"start\"))\n","async def start_cmd(message: types.Message):\n","    await message.answer(\n","        \" RAG-Помощник по курсу AI/ML\\n\\n\"\n","        \" Я отвечаю на вопросы, используя:\\n\"\n","        \" Базу знаний из 30 тем\\n\"\n","        \" GigaChat для генерации ответов\\n\\n\"\n","        \" Примеры вопросов:\\n\"\n","        \"- Что такое нейронная сеть?\\n\"\n","        \"- Что такое Docker?\\n\"\n","        \"- Что такое Spark?\\n\"\n","        \"- Что такое Kafka?\\n\"\n","        \"- Что такое RAG?\\n\\n\"\n","        \"Просто напишите ваш вопрос!\"\n","    )\n","\n","@dp.message(Command(\"help\"))\n","async def help_cmd(message: types.Message):\n","    await message.answer(\n","        \"• Доступные темы:\\n\\n\"\n","        \"• Нейронные сети (Keras, TensorFlow, PyTorch)\\n\"\n","        \"• Градиентный спуск\\n\"\n","        \"• Свёрточные сети (CNN)\\n\"\n","        \"• Рекуррентные сети (LSTM, RNN)\\n\"\n","        \"• Docker, контейнеризация\\n\"\n","        \"• RAG системы, LangChain\\n\"\n","        \"• PyTorch, TensorFlow\\n\"\n","        \"• AutoML\\n\"\n","        \"• Компьютерное зрение, OpenCV, YOLO\\n\"\n","        \"• NLP, BERT, T5, трансформеры\\n\"\n","        \"• Распознавание речи (Whisper)\\n\"\n","        \"• Базы данных SQL\\n\"\n","        \"• FastAPI, деплой\\n\"\n","        \"• GigaChat, локальные модели\\n\"\n","        \"• Spark, Hadoop, Kafka\\n\"\n","        \"• Airflow, MLOps\\n\"\n","        \"• Git, CI/CD, Kubernetes\\n\\n\"\n","        \"Задайте вопрос по любой теме!\"\n","    )\n","\n","@dp.message()\n","async def handle_question(message: types.Message):\n","    question = message.text.strip()\n","\n","    if not question or question.startswith('/'):\n","        return\n","\n","    await bot.send_chat_action(message.chat.id, \"typing\")\n","\n","    print(f\"\\n{'='*60}\")\n","    print(f\"[НОВЫЙ ЗАПРОС] Пользователь: {message.from_user.username}\")\n","    print(f\"[ВОПРОС] {question}\")\n","    print(f\"[ВРЕМЯ] {time.strftime('%Y-%m-%d %H:%M:%S')}\")\n","    print(f\"{'='*60}\")\n","\n","    topic = find_topic(question)\n","\n","    if not topic:\n","        await message.answer(\n","            \"• Не нашёл информацию на этот вопрос.\\n\\n\"\n","            \"• Попробуйте спросить о:\\n\"\n","            \"• Нейронных сетях, градиентном спуске\\n\"\n","            \"• Docker, RAG, PyTorch, TensorFlow\\n\"\n","            \"• Spark, Kafka, NLP\\n\"\n","            \"• GigaChat, FastAPI, Git, CI/CD\\n\\n\"\n","            \"Используйте /help для полного списка тем.\"\n","        )\n","        return\n","\n","    status_msg = await message.answer(f\" Найдена тема: {topic['title']}\\n\\n Формирую ответ через GigaChat...\")\n","\n","    answer = ask_gigachat(question, topic['content'][:3500], topic['title'])\n","\n","    final_answer = f\"{answer}\\n\\n Источник: {topic['title']}\"\n","\n","    if len(final_answer) \u003e 4000:\n","        final_answer = final_answer[:3950] + \"...\\n\\n(ответ обрезан)\"\n","\n","    await status_msg.edit_text(final_answer)\n","\n","    print(f\"[ОТВЕТ] Пользователю: {message.from_user.username}\")\n","    print(f\"[ИСТОЧНИК] {topic['title']}\")\n","    print(f\"{'='*60}\\n\")"]},{"cell_type":"code","execution_count":null,"metadata":{"colab":{"background_save":true,"base_uri":"https://localhost:8080/"},"id":"k1oDV7FkLWD8"},"outputs":[{"name":"stdout","output_type":"stream","text":["\n","============================================================\n"," TELEGRAM RAG БОТ ЗАПУЩЕН!\n","============================================================\n","Бот: @aiml_knowledge_bot\n","Тем в базе: 30\n","GigaChat: доступен (температура = 0.3)\n","============================================================\n","Бот готов отвечать на вопросы!\n","============================================================\n","\n","============================================================\n","[НОВЫЙ ЗАПРОС] Пользователь: Alina_has007\n","[ВОПРОС] python\n","[ВРЕМЯ] 2026-05-23 09:25:44\n","============================================================\n","\n","[НОВЫЙ ЗАПРОС] Вопрос: python\n","[РЕЗУЛЬТАТ] Тема не найдена для запроса: python\n","\n","============================================================\n","[НОВЫЙ ЗАПРОС] Пользователь: Alina_has007\n","[ВОПРОС] docker\n","[ВРЕМЯ] 2026-05-23 09:25:51\n","============================================================\n","\n","[НОВЫЙ ЗАПРОС] Вопрос: docker\n","[РЕЗУЛЬТАТ] Найдена тема 6: ТЕМА 6: DOCKER И КОНТЕЙНЕРИЗАЦИЯ (по ключу 'docker')\n","\n","[GIGACHAT] Отправка запроса...\n","[GIGACHAT] Тема: ТЕМА 6: DOCKER И КОНТЕЙНЕРИЗАЦИЯ\n","[GIGACHAT] Размер контекста: 507 символов\n","[GIGACHAT] Ответ получен, длина: 1526 символов\n","[ОТВЕТ] Пользователю: Alina_has007\n","[ИСТОЧНИК] ТЕМА 6: DOCKER И КОНТЕЙНЕРИЗАЦИЯ\n","============================================================\n","\n","\n","============================================================\n","[НОВЫЙ ЗАПРОС] Пользователь: Alina_has007\n","[ВОПРОС] rag\n","[ВРЕМЯ] 2026-05-23 09:26:33\n","============================================================\n","\n","[НОВЫЙ ЗАПРОС] Вопрос: rag\n","[РЕЗУЛЬТАТ] Найдена тема 7: ТЕМА 7: RAG СИСТЕМЫ (RETRIEVAL-AUGMENTED GENERATION) (по ключу 'rag')\n","\n","[GIGACHAT] Отправка запроса...\n","[GIGACHAT] Тема: ТЕМА 7: RAG СИСТЕМЫ (RETRIEVAL-AUGMENTED GENERATION)\n","[GIGACHAT] Размер контекста: 615 символов\n","[GIGACHAT] Ответ получен, длина: 1732 символов\n","[ОТВЕТ] Пользователю: Alina_has007\n","[ИСТОЧНИК] ТЕМА 7: RAG СИСТЕМЫ (RETRIEVAL-AUGMENTED GENERATION)\n","============================================================\n","\n","\n","============================================================\n","[НОВЫЙ ЗАПРОС] Пользователь: Alina_has007\n","[ВОПРОС] как обучить модель на Tensorflow\n","[ВРЕМЯ] 2026-05-23 09:37:22\n","============================================================\n","\n","[НОВЫЙ ЗАПРОС] Вопрос: как обучить модель на Tensorflow\n","[РЕЗУЛЬТАТ] Найдена тема 9: ТЕМА 9: TENSORFLOW (по ключу 'tensorflow')\n","\n","[GIGACHAT] Отправка запроса...\n","[GIGACHAT] Тема: ТЕМА 9: TENSORFLOW\n","[GIGACHAT] Размер контекста: 440 символов\n","[GIGACHAT] Ответ получен, длина: 2965 символов\n","[ОТВЕТ] Пользователю: Alina_has007\n","[ИСТОЧНИК] ТЕМА 9: TENSORFLOW\n","============================================================\n","\n","\n","============================================================\n","[НОВЫЙ ЗАПРОС] Пользователь: Alina_has007\n","[ВОПРОС] Что такое погода?\n","[ВРЕМЯ] 2026-05-23 09:39:23\n","============================================================\n","\n","[НОВЫЙ ЗАПРОС] Вопрос: Что такое погода?\n","[РЕЗУЛЬТАТ] Тема не найдена для запроса: Что такое погода?\n"]}],"source":["# -------------------- ЯЧЕЙКА 10: ЗАПУСК БОТА --------------------\n","import time\n","import nest_asyncio\n","nest_asyncio.apply()\n","\n","async def main():\n","    await bot.delete_webhook(drop_pending_updates=True)\n","    info = await bot.get_me()\n","    print(\"\\n\" + \"=\"*60)\n","    print(\" TELEGRAM RAG БОТ ЗАПУЩЕН!\")\n","    print(\"=\"*60)\n","    print(f\"Бот: @{info.username}\")\n","    print(f\"Тем в базе: {len(topics)}\")\n","    print(f\"GigaChat: доступен (температура = {TEMPERATURE})\")\n","    print(\"=\"*60)\n","    print(\"Бот готов отвечать на вопросы!\")\n","    print(\"=\"*60)\n","    await dp.start_polling(bot)\n","\n","if __name__ == \"__main__\":\n","    asyncio.run(main())"]}],"metadata":{"colab":{"authorship_tag":"ABX9TyN1m54WE5hBOnVTnXOTZzD1","name":"","version":""},"kernelspec":{"display_name":"Python 3","name":"python3"},"language_info":{"name":"python"}},"nbformat":4,"nbformat_minor":0}
+import os
+import re
+import asyncio
+import logging
+import time
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import Command
+from gigachat import GigaChat
+
+# -------------------- ЛОГГИРОВАНИЕ --------------------
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# -------------------- ПОЛУЧЕНИЕ ТОКЕНОВ --------------------
+BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+GIGACHAT_CREDENTIALS = os.getenv('GIGACHAT_SECRET')
+
+if not BOT_TOKEN:
+    raise ValueError("Нет токена Telegram! Добавьте TELEGRAM_BOT_TOKEN в секреты.")
+if not GIGACHAT_CREDENTIALS:
+    raise ValueError("Нет секрета GigaChat! Добавьте GIGACHAT_SECRET в секреты.")
+
+logger.info("Токены получены")
+
+# -------------------- ИНИЦИАЛИЗАЦИЯ GIGACHAT --------------------
+TEMPERATURE = 0.3
+
+gigachat_client = GigaChat(
+    credentials=GIGACHAT_CREDENTIALS,
+    scope="GIGACHAT_API_PERS",
+    verify_ssl_certs=False,
+    timeout=60.0,
+    temperature=TEMPERATURE
+)
+logger.info(f"GigaChat клиент подключен (температура = {TEMPERATURE})")
+
+# -------------------- ЗАГРУЗКА БАЗЫ ЗНАНИЙ --------------------
+def load_topics_from_file(file_path="RAG_KNOWLEDGE_BASE.txt"):
+    topics = []
+    if not os.path.exists(file_path):
+        logger.error(f"Файл {file_path} не найден!")
+        return topics
+    
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    sections = re.split(r'(=== ТЕМА \d+: [^=]+ ===)', content)
+    
+    for i in range(1, len(sections), 2):
+        title = sections[i].strip()
+        text = sections[i+1].strip() if i+1 < len(sections) else ""
+        if title and text:
+            clean_title = title.replace('===', '').strip()
+            topics.append({
+                'title': clean_title,
+                'content': text,
+                'number': i // 2 + 1
+            })
+    
+    logger.info(f"Загружено тем: {len(topics)}")
+    return topics
+
+topics = load_topics_from_file("RAG_KNOWLEDGE_BASE.txt")
+
+if not topics:
+    logger.warning("Файл RAG_KNOWLEDGE_BASE.txt не найден! Использую темы по умолчанию.")
+    topics = [
+        {'title': 'DOCKER', 'content': 'Docker — контейнеризация приложений.', 'number': 1},
+        {'title': 'SPARK', 'content': 'Spark — распределённая обработка данных.', 'number': 2},
+    ]
+
+# -------------------- ПОИСК ТЕМЫ --------------------
+def find_topic(question):
+    q_lower = question.lower()
+    
+    topic_mapping = {
+        'spark': 25, 'hadoop': 25, 'pyspark': 25,
+        'kafka': 30, 'потоковая': 30,
+        'nlp': 17, 'обработка естественного языка': 17,
+        'bert': 18, 't5': 18, 'transformer': 18, 'gpt': 18,
+        'docker': 6, 'контейнер': 6, 'dockerfile': 22,
+        'airflow': 27, 'mlflow': 27, 'mlops': 27,
+        'git': 28, 'github': 28, 'gitlab': 28, 'ci/cd': 29,
+        'нейронная': 2, 'keras': 2,
+        'градиентный': 3,
+        'cnn': 4, 'сверточная': 4,
+        'lstm': 5, 'rnn': 5,
+        'rag': 7, 'langchain': 7,
+        'pytorch': 8, 'tensorflow': 9,
+        'automl': 10,
+        'opencv': 11, 'компьютерное зрение': 11, 'yolo': 11,
+        'whisper': 13, 'распознавание речи': 13,
+        'sql': 14, 'база данных': 14,
+        'fastapi': 15,
+        'gigachat': 21, 'гигачат': 21,
+        'scikit-learn': 26, 'sklearn': 26,
+    }
+
+    logger.info(f"Новый запрос: {question}")
+
+    for keyword, topic_num in topic_mapping.items():
+        if keyword in q_lower:
+            for t in topics:
+                if t['number'] == topic_num:
+                    logger.info(f"Найдена тема {topic_num}: {t['title']} (по ключу '{keyword}')")
+                    return t
+
+    for t in topics:
+        title_lower = t['title'].lower()
+        if any(word in title_lower for word in q_lower.split() if len(word) > 3):
+            logger.info(f"Найдена тема {t['number']}: {t['title']} (по заголовку)")
+            return t
+
+    for t in topics:
+        content_lower = t['content'].lower()
+        words = [w for w in q_lower.split() if len(w) > 4]
+        matches = sum(1 for w in words if w in content_lower)
+        if matches >= 2:
+            logger.info(f"Найдена тема {t['number']}: {t['title']} (по содержимому)")
+            return t
+
+    logger.info(f"Тема не найдена для запроса: {question}")
+    return None
+
+# -------------------- ЗАПРОС К GIGACHAT --------------------
+def ask_gigachat(question, context, topic_title):
+    logger.info(f"Отправка запроса к GigaChat. Тема: {topic_title}")
+
+    prompt = f"""Ты эксперт по курсу AI/ML. Используй ТОЛЬКО контекст ниже.
+
+Тема: {topic_title}
+
+Если ответ ЕСТЬ в контексте - дай развёрнутый ответ.
+Если ответа НЕТ - напиши: "В базе знаний нет информации."
+
+КОНТЕКСТ:
+{context[:3500]}
+
+ВОПРОС: {question}
+
+ОТВЕТ:"""
+
+    try:
+        response = gigachat_client.chat(prompt)
+        if response and response.choices:
+            answer = response.choices[0].message.content
+            logger.info(f"Ответ получен, длина: {len(answer)} символов")
+            return answer
+        return "Ошибка получения ответа от GigaChat"
+    except Exception as e:
+        logger.error(f"Ошибка GigaChat: {str(e)[:100]}")
+        return f"Ошибка: {str(e)[:100]}"
+
+# -------------------- СОЗДАНИЕ БОТА --------------------
+bot = Bot(token=BOT_TOKEN)
+dp = Dispatcher()
+
+@dp.message(Command("start"))
+async def start_cmd(message: types.Message):
+    await message.answer(
+        "RAG-Помощник по курсу AI/ML\n\n"
+        "Я отвечаю на вопросы, используя:\n"
+        "Базу знаний из 30 тем\n"
+        "GigaChat для генерации ответов\n\n"
+        "Примеры вопросов:\n"
+        "- Что такое нейронная сеть?\n"
+        "- Что такое Docker?\n"
+        "- Что такое Spark?\n"
+        "- Что такое Kafka?\n"
+        "- Что такое RAG?\n\n"
+        "Просто напишите ваш вопрос!"
+    )
+
+@dp.message(Command("help"))
+async def help_cmd(message: types.Message):
+    await message.answer(
+        " Доступные темы:\n\n"
+        "• Нейронные сети (Keras, TensorFlow, PyTorch)\n"
+        "• Градиентный спуск\n"
+        "• Свёрточные сети (CNN)\n"
+        "• Рекуррентные сети (LSTM, RNN)\n"
+        "• Docker, контейнеризация\n"
+        "• RAG системы, LangChain\n"
+        "• PyTorch, TensorFlow\n"
+        "• AutoML\n"
+        "• Компьютерное зрение, OpenCV, YOLO\n"
+        "• NLP, BERT, T5, трансформеры\n"
+        "• Распознавание речи (Whisper)\n"
+        "• Базы данных SQL\n"
+        "• FastAPI, деплой\n"
+        "• GigaChat, локальные модели\n"
+        "• Spark, Hadoop, Kafka\n"
+        "• Airflow, MLOps\n"
+        "• Git, CI/CD, Kubernetes\n\n"
+        "Задайте вопрос по любой теме!"
+    )
+
+@dp.message()
+async def handle_question(message: types.Message):
+    question = message.text.strip()
+
+    if not question or question.startswith('/'):
+        return
+
+    await bot.send_chat_action(message.chat.id, "typing")
+
+    logger.info(f"Новый запрос от @{message.from_user.username}: {question}")
+
+    topic = find_topic(question)
+
+    if not topic:
+        await message.answer(
+            "Не нашёл информацию на этот вопрос.\n\n"
+            "Попробуйте спросить о:\n"
+            "• Нейронных сетях, градиентном спуске\n"
+            "• Docker, RAG, PyTorch, TensorFlow\n"
+            "• Spark, Kafka, NLP\n"
+            "• GigaChat, FastAPI, Git, CI/CD\n\n"
+            "Используйте /help для полного списка тем."
+        )
+        return
+
+    status_msg = await message.answer(f" Найдена тема: {topic['title']}\n\n Формирую ответ через GigaChat...")
+
+    answer = ask_gigachat(question, topic['content'][:3500], topic['title'])
+
+    final_answer = f"{answer}\n\n Источник: {topic['title']}"
+
+    if len(final_answer) > 4000:
+        final_answer = final_answer[:3950] + "...\n\n(ответ обрезан)"
+
+    await status_msg.edit_text(final_answer)
+
+    logger.info(f"Ответ отправлен пользователю @{message.from_user.username}")
+
+# -------------------- ЗАПУСК БОТА --------------------
+async def main():
+    await bot.delete_webhook(drop_pending_updates=True)
+    info = await bot.get_me()
+    
+    print("\n" + "="*60)
+    print(" TELEGRAM RAG БОТ ЗАПУЩЕН!")
+    print("="*60)
+    print(f"Бот: @{info.username}")
+    print(f"Тем в базе: {len(topics)}")
+    print(f"GigaChat: доступен (температура = {TEMPERATURE})")
+    print("="*60)
+    print("Бот готов отвечать на вопросы!")
+    print("="*60)
+    
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
