@@ -1,15 +1,17 @@
-FROM python:3.11-slim
-
 WORKDIR /app
 
-# Копируем зависимости
+# Копируем зависимости (убедитесь, что файл называется requirements.txt, а не requirementstxt)
 COPY requirements.txt .
+
+# Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем код
-COPY RAG_WEBSITE_GIGACHAT_FINAL.py .
+# Копируем код и данные (ИСПРАВЛЕНО: используем точные имена с вашего скриншота)
+COPY RAG_WEBSITE_EXPERIMENTS.py .
 COPY RAG_KNOWLEDGE_BASE.txt .
-COPY images/ images/
 
-# Запускаем
-CMD ["streamlit", "run", "RAG_WEBSITE_GIGACHAT_FINAL.py", "--server.port=7860", "--server.address=0.0.0.0"]
+# Копируем папку с картинками
+COPY images ./images
+
+# Запускаем приложение (ОБЯЗАТЕЛЬНО исправьте имя файла и здесь, в CMD!)
+CMD ["streamlit", "run", "RAG_WEBSITE_EXPERIMENTS.py", "--server.port=7860", "--server.address=0.0.0.0"]
