@@ -2,6 +2,7 @@ import os
 import re
 import time
 import asyncio
+import threading
 from flask import Flask
 from aiogram import Bot, Dispatcher, types
 from gigachat import GigaChat
@@ -134,7 +135,7 @@ async def handle_message(message: types.Message):
     await message.answer(answer)
 
 # ==========================================
-# 5. ОСНОВНОЙ ЗАПУСК БЕЗ ПОТОКОВ
+# 5. ЗАПУСК (ПРАВИЛЬНЫЙ ВАРИАНТ)
 # ==========================================
 app = Flask(__name__)
 
@@ -145,16 +146,17 @@ def home():
 if __name__ == "__main__":
     print("Запуск Telegram бота...")
     
-    # Запускаем бота в асинхронном режиме в фоне
-    async def start_bot():
-        await dp.start_polling(bot)
-
-    # Параллельно запускаем бота и веб-сервер
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.create_task(start_bot())
+    # Запускаем бота в отдельном потоке через asyncio
+    def run_bot_in_thread():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(dp.start_polling(bot))
     
-    # Запускаем веб-сервер в том же потоке (он будет висеть)
+    bot_thread = threading.Thread(target=run_bot_in_thread)
+    bot_thread.daemon = True  # Если упадёт Flask, бот закроется вместе с ним
+    bot_thread.start()
+    
+    # Запускаем веб-сервер в основном потоке
     port = int(os.environ.get('PORT', 10000))
     print(f"Веб-сервер запущен на порту {port}...")
     app.run(host='0.0.0.0', port=port)
