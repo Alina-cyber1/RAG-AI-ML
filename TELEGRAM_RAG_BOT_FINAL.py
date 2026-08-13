@@ -1,10 +1,10 @@
 import os
 import re
 import time
-import asyncio
 import threading
 from flask import Flask
-from aiogram import Bot, Dispatcher, types
+from telegram import Update
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from gigachat import GigaChat
 
 # ==========================================
@@ -12,10 +12,6 @@ from gigachat import GigaChat
 # ==========================================
 BOT_TOKEN = os.getenv("BOT_TOKEN", "ВАШ_ТОКЕН_ОТ_BOTFATHER")
 GIGACHAT_SECRET = os.getenv("GIGACHAT_SECRET", "ВАШ_СЕКРЕТНЫЙ_КЛЮЧ_GIGACHAT")
-
-# Инициализация
-bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher()
 
 # GigaChat
 def init_gigachat():
@@ -115,15 +111,13 @@ def ask_gigachat(question, context, topic_title):
         return f"Ошибка: {str(e)[:100]}"
 
 # ==========================================
-# 4. ОБРАБОТЧИК СООБЩЕНИЙ
+# 4. ОБРАБОТЧИКИ TELEGRAM (НОВАЯ БИБЛИОТЕКА)
 # ==========================================
-@dp.message()
-async def handle_message(message: types.Message):
-    if message.text == "/start":
-        await message.answer("Привет! Я RAG-ассистент. Задай вопрос по AI/ML!")
-        return
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Привет! Я RAG-ассистент. Задай вопрос по AI/ML!")
 
-    user_question = message.text
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_question = update.message.text
     topic = find_topic(user_question, topics_data)
     
     if not topic:
@@ -132,10 +126,10 @@ async def handle_message(message: types.Message):
         answer = ask_gigachat(user_question, topic['content'][:3500], topic['title'])
         answer += f"\n\n---\nИсточник: {topic['title']}"
     
-    await message.answer(answer)
+    await update.message.reply_text(answer)
 
 # ==========================================
-# 5. ЗАПУСК (ПРАВИЛЬНЫЙ ВАРИАНТ)
+# 5. ВЕБ-СЕРВЕР FLASK (ДЛЯ RENDER)
 # ==========================================
 app = Flask(__name__)
 
@@ -143,20 +137,25 @@ app = Flask(__name__)
 def home():
     return "Telegram RAG Bot is Running!"
 
+# ==========================================
+# 6. ТОЧКА ВХОДА (ЗАПУСК)
+# ==========================================
 if __name__ == "__main__":
     print("Запуск Telegram бота...")
-    
-    # Запускаем бота в отдельном потоке через asyncio
-    def run_bot_in_thread():
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(dp.start_polling(bot))
-    
-    bot_thread = threading.Thread(target=run_bot_in_thread)
-    bot_thread.daemon = True  # Если упадёт Flask, бот закроется вместе с ним
+
+    # Запускаем бота в фоновом потоке
+    def run_bot():
+        application = Application.builder().token(BOT_TOKEN).build()
+        application.add_handler(CommandHandler("start", start))
+        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+        print("Бот запущен и слушает сообщения...")
+        application.run_polling()
+
+    bot_thread = threading.Thread(target=run_bot)
+    bot_thread.daemon = True
     bot_thread.start()
-    
-    # Запускаем веб-сервер в основном потоке
+
+    # Запускаем веб-сервер Flask
     port = int(os.environ.get('PORT', 10000))
     print(f"Веб-сервер запущен на порту {port}...")
     app.run(host='0.0.0.0', port=port)
