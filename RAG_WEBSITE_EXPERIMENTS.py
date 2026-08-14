@@ -114,15 +114,32 @@ def load_topics():
     
     return topics
 
-# -------------------- ПОИСК ТЕМЫ --------------------
+# -------------------- УМНЫЙ ПОИСК ТЕМЫ (3 УРОВНЯ) --------------------
 def find_topic(question, topics):
     q_lower = question.lower()
     
+    # 1. Поиск по точным ключевым словам
     topic_mapping = {
-        'spark': 25, 'docker': 6, 'kafka': 30,
-        'nlp': 17, 'rag': 7, 'pytorch': 8,
-        'tensorflow': 9, 'git': 28, 'fastapi': 15,
-        'gigachat': 21, 'cnn': 4, 'lstm': 5,
+        'spark': 25, 'hadoop': 25, 'pyspark': 25,
+        'kafka': 30, 'потоковая обработка': 30,
+        'nlp': 17, 'обработка естественного языка': 17,
+        'bert': 18, 't5': 18, 'transformer': 18, 'gpt': 18,
+        'docker': 6, 'контейнер': 6, 'dockerfile': 22,
+        'airflow': 27, 'mlflow': 27, 'mlops': 27,
+        'git': 28, 'github': 28, 'gitlab': 28, 'ci/cd': 29,
+        'нейронная сеть': 2, 'keras': 2,
+        'градиентный спуск': 3,
+        'cnn': 4, 'сверточная': 4,
+        'lstm': 5, 'rnn': 5,
+        'rag': 7, 'langchain': 7,
+        'pytorch': 8, 'tensorflow': 9,
+        'automl': 10,
+        'opencv': 11, 'компьютерное зрение': 11, 'yolo': 11,
+        'whisper': 13, 'распознавание речи': 13,
+        'sql': 14, 'база данных': 14,
+        'fastapi': 15,
+        'gigachat': 21, 'гигачат': 21,
+        'scikit-learn': 26, 'sklearn': 26,
     }
     
     for keyword, topic_num in topic_mapping.items():
@@ -131,6 +148,14 @@ def find_topic(question, topics):
                 if t['number'] == topic_num:
                     return t
     
+    # 2. Поиск по содержанию текста (гибкий поиск)
+    for t in topics:
+        words = q_lower.split()
+        for word in words:
+            if len(word) > 3 and word in t['content'].lower():
+                return t
+    
+    # 3. Поиск по заголовку
     for t in topics:
         if any(word.lower() in t['title'].lower() for word in q_lower.split() if len(word) > 3):
             return t
@@ -163,7 +188,6 @@ def ask_gigachat(client, question, context, topic_title):
 
 # -------------------- ИНТЕРФЕЙС --------------------
 def main():
-    # Заголовок с фиолетовым акцентом (без эмодзи)
     st.title("RAG-Ассистент AI/ML")
     st.caption("Ответы по курсу AI/ML на основе 30 тем")
     
@@ -180,7 +204,7 @@ def main():
         if len(topics) > 10:
             st.write(f"... и ещё {len(topics)-10} тем")
     
-    # Инициализация истории чата
+    # Инициализация истории чата (исправляет красную рамку)
     if "messages" not in st.session_state:
         st.session_state.messages = [
             {"role": "assistant", "content": "Привет! Задайте вопрос по AI/ML!"}
