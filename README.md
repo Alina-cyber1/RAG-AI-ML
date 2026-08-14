@@ -6,8 +6,8 @@
 
 ## Живое демо
 
-- **Попробовать веб-интерфейс:** [https://rag-ai-ml-egvefzmes5tf8x29sdyvm3.streamlit.app/](https://rag-ai-ml-egvefzmes5tf8x29sdyvm3.streamlit.app/)
-- **Telegram-бот:** [@aiml_knowledge_bot](https://t.me/aiml_knowledge_bot)
+- **Попробовать веб-интерфейс:** [Веб-интрефейс](https://rag-ai-ml-egvefzmes5tf8x29sdyvm3.streamlit.app/)
+- **Telegram-бот:** [@AI_ML_Knowledge_bot](https://t.me/aiml_knowledge_bot)
 
 ## Скриншоты
 
@@ -20,6 +20,12 @@
 | **Корректный отказ при вопросе вне базы знаний** |
 | :---: |
 | ![Пример отказа](images/out_of_knowledge.png) |
+
+## Скриншоты
+- **Веб-интерфейс:** Пример диалога в боте
+- **Главный экран веб-интерфейса:** Диалог с Telegram-ботом
+- **Корректный отказ при вопросе вне базы знаний:** Пример отказа
+
 
 ---
 
