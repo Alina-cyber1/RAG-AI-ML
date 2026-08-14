@@ -39,9 +39,6 @@
 | :---: | :---: |
 | ![Схема работы](images/architecture.png) | ![Сравнение](images/compare_methods.png) |
 
-**Влияние размера чанка (FAISS):**
-![Chunk Size](images/chunk_size.png)
-
 
 ---
 
