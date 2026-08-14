@@ -72,7 +72,9 @@ RAG-система для автоматического поиска и ген�
   - Веб-интерфейс: Streamlit
   - Telegram-бот: `python-telegram-bot`
 - **Инструменты:** Git, Docker (для локальной сборки)
-- **Деплой:** Streamlit Cloud (Web) и Railway (Telegram-бот)
+- **Деплой:**
+  - **Веб-приложение:** Задеплоено на **Streamlit Cloud**.
+  - **Telegram-бот:** Задеплоен на **Railway** (работает 24/7 без простоев).
 
 ---
 
