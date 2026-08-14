@@ -138,24 +138,27 @@ def home():
     return "Telegram RAG Bot is Running!"
 
 # ==========================================
-# 6. ТОЧКА ВХОДА (ЗАПУСК)
+# 6. ТОЧКА ВХОДА (БЕЗ ПОТОКОВ И ASYNCIO)
 # ==========================================
 if __name__ == "__main__":
+    import asyncio
+    
+    # Настраиваем приложение Telegram
+    application = Application.builder().token(BOT_TOKEN).build()
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    
     print("Запуск Telegram бота...")
-
-    # Запускаем бота в фоновом потоке
-    def run_bot():
-        application = Application.builder().token(BOT_TOKEN).build()
-        application.add_handler(CommandHandler("start", start))
-        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-        print("Бот запущен и слушает сообщения...")
-        application.run_polling()
-
-    bot_thread = threading.Thread(target=run_bot)
-    bot_thread.daemon = True
-    bot_thread.start()
-
-    # Запускаем веб-сервер Flask
-    port = int(os.environ.get('PORT', 10000))
-    print(f"Веб-сервер запущен на порту {port}...")
-    app.run(host='0.0.0.0', port=port)
+    
+    # Запускаем веб-сервер в отдельном потоке (чтобы не блокировать бота)
+    def run_flask():
+        port = int(os.environ.get('PORT', 8080))
+        app.run(host='0.0.0.0', port=port)
+        
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.daemon = True
+    flask_thread.start()
+    
+    # Запускаем бота в основном потоке с правильной asyncio логикой
+    print("Бот запущен и слушает сообщения...")
+    application.run_polling()
