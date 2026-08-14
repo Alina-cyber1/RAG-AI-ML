@@ -8,13 +8,13 @@
 
 - **Попробовать веб-интерфейс:** [Веб-интрефейс](https://rag-ai-ml-egvefzmes5tf8x29sdyvm3.streamlit.app/)
 - **Telegram-бот:** [@AI_ML_Knowledge_bot](https://t.me/aiml_knowledge_bot)
-
+  
+---
 
 ## Скриншоты
 - **Веб-интерфейс:** Пример диалога в боте | ![Главный экран веб-интерфейса](images/web_interface.png) | |
 - **Главный экран веб-интерфейса:** Диалог с Telegram-ботом ![Диалог с Telegram-ботом](images/tg_bot_dialog.png) |
 - **Корректный отказ при вопросе вне базы знаний:** | ![Пример отказа](images/out_of_knowledge.png) |
-
 
 ---
 
