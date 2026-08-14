@@ -65,9 +65,7 @@ topics_data = load_topics()
 def find_topic(question, topics):
     q_lower = question.lower()
     
-    topic_mapping = {
-      def find_topic(question):
-    q_lower = question.lower()
+    # 1. Сначала попробуем найти по точным ключевым словам (ваш старый список)
     topic_mapping = {
         'spark': 25, 'hadoop': 25, 'pyspark': 25,
         'kafka': 30, 'потоковая обработка': 30,
@@ -97,10 +95,21 @@ def find_topic(question, topics):
                 if t['number'] == topic_num:
                     return t
     
+    # 2. Если не нашли по ключевым словам, ищем по вхождению в любой текст темы
+    for t in topics:
+        # Разбиваем вопрос на отдельные слова
+        words = q_lower.split()
+        for word in words:
+            # Если слово длиннее 3 букв и встречается в тексте темы
+            if len(word) > 3 and word in t['content'].lower():
+                return t
+    
+    # 3. Если ничего не нашли, ищем по заголовку
     for t in topics:
         if any(word.lower() in t['title'].lower() for word in q_lower.split() if len(word) > 3):
             return t
     
+    # 4. Если ничего не найдено
     return None
 
 def ask_gigachat(question, context, topic_title):
