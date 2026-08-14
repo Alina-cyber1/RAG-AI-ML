@@ -3,13 +3,11 @@
 
 Данный проект — это моя дипломная работа. Это RAG-система (Retrieval-Augmented Generation), которая отвечает на вопросы по 30 темам курса AI/ML через удобные Telegram-бота и веб-интерфейс. Система использует тематический поиск для точного нахождения контекста и языковую модель GigaChat для генерации ответов без "галлюцинаций".
 
+
 ## Живое демо
 
-[ **Попробовать веб-интерфейс**]([https://your-demo-link.com](https://rag-ai-ml-egvefzmes5tf8x29sdyvm3.streamlit.app/))  
-[ **Telegram-бот**](https://t.me/AI_ML_Knowledge_Bot)
-## Живое демо
-- **Попробовать веб-интерфейс:** [Ссылка на Streamlit]([https://rag-ai-ml.streamlit.app/](https://rag-ai-ml-egvefzmes5tf8x29sdyvm3.streamlit.app/))
-- **Telegram-бот:** [@Иaiml_knowledge_bot]
+- **Попробовать веб-интерфейс:** [[https://rag-ai-ml.streamlit.app/](https://rag-ai-ml-egvefzmes5tf8x29sdyvm3.streamlit.app/]
+- **Telegram-бот:** [@aiml_knowledge_bot]
 ---
 
 ## Скриншоты
