@@ -7,7 +7,9 @@
 
 [ **Попробовать веб-интерфейс**]([https://your-demo-link.com](https://rag-ai-ml-egvefzmes5tf8x29sdyvm3.streamlit.app/))  
 [ **Telegram-бот**](https://t.me/AI_ML_Knowledge_Bot)
-
+## Живое демо
+- **Попробовать веб-интерфейс:** [Ссылка на Streamlit]([https://rag-ai-ml.streamlit.app/](https://rag-ai-ml-egvefzmes5tf8x29sdyvm3.streamlit.app/))
+- **Telegram-бот:** [@Иaiml_knowledge_bot]
 ---
 
 ## Скриншоты
