@@ -14,7 +14,8 @@
 
 | Демонстрация работы | Работа с базой знаний |
 | :---: | :---: |
-| ![Веб-интерфейс и Telegram-бот](images/web_interface.png)<br>*Веб-интерфейс и Telegram-бот* | ![Диалог с Telegram-ботом](images/tg_bot_dialog.png)<br>*Диалог с Telegram-ботом* |
+| ![Веб-интерфейс и Telegram-бот](images/web_interface.png)<br>*Веб-интерфейс и Telegram-бот* |  ![Диалог с Telegram-ботом](https://github.com/Alina-cyber1/RAG-AI-ML/raw/main/images/tg_bot_demo.png)
+
 
 ### Пример корректного отказа при вопросе вне базы знаний
 
