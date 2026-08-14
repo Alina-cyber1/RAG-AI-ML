@@ -5,8 +5,8 @@
 
 ## Живое демо
 
-[ **Попробовать веб-интерфейс**](https://your-demo-link.com)  
-[ **Telegram-бот**](https://t.me/your_bot_username)
+[ **Попробовать веб-интерфейс**]([https://your-demo-link.com](https://rag-ai-ml-egvefzmes5tf8x29sdyvm3.streamlit.app/))  
+[ **Telegram-бот**](https://t.me/AI_ML_Knowledge_Bot)
 
 ---
 
