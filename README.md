@@ -9,7 +9,6 @@ RAG-система для автоматического поиска и ген�
 
 ## Живое демо
 
-- **Попробовать веб-интерфейс:** [Веб-интрефейс](https://rag-ai-ml-egvefzmes5tf8x29sdyvm3.streamlit.app/)
 - **Веб-интерфейс:** [RAG-Ассистент на Streamlit Cloud](https://rag-ai-ml-egvefzmes5tf8x29sdyvm3.streamlit.app/)
 - **Telegram-бот:** [@AI_ML_Knowledge_bot](https://t.me/aiml_knowledge_bot) 
 
