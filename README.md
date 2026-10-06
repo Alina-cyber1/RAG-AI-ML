@@ -5,9 +5,7 @@
 ![GigaChat](https://img.shields.io/badge/LLM-GigaChat-green)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
-RAG-система для автоматического поиска и генерации ответов по документации курса AI/ML
-
-Данный проект — это моя дипломная работа. Это RAG-система (Retrieval-Augmented Generation), которая отвечает на вопросы по 30 темам курса AI/ML через удобные Telegram-бота и веб-интерфейс. Система использует тематический поиск для точного нахождения контекста и языковую модель GigaChat для генерации ответов без "галлюцинаций".
+RAG-система для автоматического поиска и генерации ответов по документации курса AI/ML.
 
 ## Живое демо
 
@@ -15,7 +13,23 @@ RAG-система для автоматического поиска и ген�
 - **Telegram-бот:** [@AI_ML_Knowledge_bot](https://t.me/aiml_knowledge_bot) 
 
 ---
+## Структура проекта
 
+```
+RAG-AI-ML/
+├── .streamlit/                 # Конфигурация Streamlit
+├── images/                     # Скриншоты и схемы
+├── data/                       # Данные экспериментов
+├── notebooks/                  # Ноутбуки с экспериментами
+├── .gitignore
+├── .python-version
+├── RAG_KNOWLEDGE_BASE.txt      # База знаний (30 тем)
+├── RAG_WEBSITE_EXPERIMENTS.py  # Веб-интерфейс на Streamlit
+├── TELEGRAM_RAG_BOT_FINAL.py   # Telegram-бот + Flask health-check
+├── requirements.txt            # Зависимости
+└── README.md
+
+```
 ## Скриншоты
 
 ### Веб-интерфейс: Главный экран и пример диалога
@@ -123,7 +137,21 @@ RAG-система для автоматического поиска и ген�
 
 ## Быстрый старт (Локальный запуск)
 
-1. Создайте виртуальное окружение и установите зависимости:
+### Предварительные требования
+
+- Python 3.12+
+- Аккаунт и API-ключ для доступа к GigaChat
+- Токен Telegram-бота от [@BotFather](https://t.me/BotFather) — для запуска бота
+
+### Установка
+
+1. Клонируйте репозиторий:
+   ```bash
+   git clone https://github.com/Alina-cyber1/RAG-AI-ML.git
+   cd RAG-AI-ML
+   ```
+
+2. Создайте виртуальное окружение и установите зависимости:
    ```bash
    python -m venv venv
    source venv/bin/activate  # Linux/macOS
@@ -131,7 +159,7 @@ RAG-система для автоматического поиска и ген�
    pip install -r requirements.txt
    ```
 
-2. Создайте файл `.env` в корне проекта:
+3. Создайте файл `.env` в корне проекта:
    ```env
    GIGACHAT_SECRET=ваш_секретный_ключ_GigaChat
    BOT_TOKEN=ваш_токен_от_BotFather
@@ -159,6 +187,8 @@ python TELEGRAM_RAG_BOT_FINAL.py
 docker build -t rag-ai-ml .
 docker run -p 8080:8080 -p 8501:8501 --env-file .env rag-ai-ml
 ```
+
+```
 ## Ограничения и развитие
 
 Текущая реализация оптимизирована под небольшую структурированную базу знаний (30 тем, ~20 тыс. символов), где кастомный тематический поиск показал себя точнее и быстрее векторного.
@@ -176,7 +206,6 @@ docker run -p 8080:8080 -p 8501:8501 --env-file .env rag-ai-ml
 ## Структура проекта
 
   RAG-AI-ML
-
 
 
 ### Предварительные требования
